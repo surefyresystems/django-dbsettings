@@ -333,7 +333,7 @@ class SettingsTestCase(test.TestCase):
     def test_forms(self):
         "Forms should display only the appropriate settings"
         from django.contrib.auth.models import User, Permission
-        from django.core.urlresolvers import reverse
+        from django.urls import reverse
 
         site_form = reverse(views.site_settings)
 

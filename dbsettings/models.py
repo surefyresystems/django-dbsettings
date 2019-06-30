@@ -20,7 +20,7 @@ class Setting(models.Model):
     value = models.CharField(max_length=VALUE_LENGTH, blank=True)
 
     if USE_SITES:
-        site = models.ForeignKey(Site)
+        site = models.ForeignKey(Site, on_delete=models.CASCADE)
         objects = SiteSettingManager()
 
         def save(self, *args, **kwargs):
