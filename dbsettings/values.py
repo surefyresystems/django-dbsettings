@@ -176,7 +176,7 @@ class PercentValue(Value):
 
     class field(forms.DecimalField):
         def __init__(self, *args, **kwargs):
-            forms.DecimalField.__init__(self, 100, 0, 5, 2, *args, **kwargs)
+            forms.DecimalField.__init__(self, max_value=100, min_value=0, max_digits=5, decimal_places=2, *args, **kwargs)
 
         class widget(forms.TextInput):
             def render(self, *args, **kwargs):

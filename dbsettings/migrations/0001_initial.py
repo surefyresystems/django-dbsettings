@@ -21,6 +21,6 @@ class Migration(migrations.Migration):
                 ('class_name', models.CharField(max_length=255, blank=True)),
                 ('attribute_name', models.CharField(max_length=255)),
                 ('value', models.CharField(max_length=VALUE_LENGTH, blank=True)),
-            ] + ([('site', models.ForeignKey(to='sites.Site'))] if USE_SITES else [])
+            ] + ([('site', models.ForeignKey(to='sites.Site', on_delete=models.CASCADE))] if USE_SITES else [])
         ),
     ]

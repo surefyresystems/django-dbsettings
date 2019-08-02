@@ -10,105 +10,21 @@ from django.utils.translation import activate, deactivate
 import dbsettings
 from dbsettings import loading, views
 
+from .models import TestSettings, Defaults, TestBaseModel, Populated, Unpopulated, Blankable, \
+    Editable, Combined, ClashSettings1, ClashSettings2, ClashSettings1_2, ModelClash, NonReq, \
+    NonRequiredSettings
 
 # Set up some settings to test
-MODULE_NAME = 'dbsettings.tests.tests'
+MODULE_NAME = 'tests.models'
 
-
-class TestSettings(dbsettings.Group):
-    boolean = dbsettings.BooleanValue()
-    integer = dbsettings.IntegerValue()
-    string = dbsettings.StringValue()
-    list_semi_colon = dbsettings.MultiSeparatorValue()
-    list_comma = dbsettings.MultiSeparatorValue(separator=',')
-    date = dbsettings.DateValue()
-    time = dbsettings.TimeValue()
-    datetime = dbsettings.DateTimeValue()
-
-# This is assigned to module, rather than a model
 module_settings = TestSettings(app_label='dbsettings')
 
-
-class Defaults(models.Model):
-    class settings(dbsettings.Group):
-        boolean = dbsettings.BooleanValue(default=True)
-        boolean_false = dbsettings.BooleanValue(default=False)
-        integer = dbsettings.IntegerValue(default=1)
-        string = dbsettings.StringValue(default="default")
-        list_semi_colon = dbsettings.MultiSeparatorValue(default=['one', 'two'])
-        list_comma = dbsettings.MultiSeparatorValue(separator=',', default=('one', 'two'))
-        date = dbsettings.DateValue(default=datetime.date(2012, 3, 14))
-        time = dbsettings.TimeValue(default=datetime.time(12, 3, 14))
-        datetime = dbsettings.DateTimeValue(default=datetime.datetime(2012, 3, 14, 12, 3, 14))
-    settings = settings()
-
-
-class TestBaseModel(models.Model):
-    class Meta:
-        abstract = True
-        app_label = 'dbsettings'
-
-
-# These will be populated by the fixture data
-class Populated(TestBaseModel):
-    settings = TestSettings()
-
-
-# These will be empty after startup
-class Unpopulated(TestBaseModel):
-    settings = TestSettings()
-
-
-# These will allow blank values
-class Blankable(TestBaseModel):
-    settings = TestSettings()
-
-
-class Editable(TestBaseModel):
-    settings = TestSettings('Verbose name')
-
-
-class Combined(TestBaseModel):
-    class settings(dbsettings.Group):
-        enabled = dbsettings.BooleanValue()
-    settings = TestSettings() + settings()
-
-
-# For registration testing
-class ClashSettings1(dbsettings.Group):
-    clash1 = dbsettings.BooleanValue()
-
-
-class ClashSettings2(dbsettings.Group):
-    clash2 = dbsettings.BooleanValue()
-
-
-class ClashSettings1_2(dbsettings.Group):
-    clash1 = dbsettings.IntegerValue()
-    clash2 = dbsettings.IntegerValue()
-
 module_clash1 = ClashSettings1(app_label='dbsettings')
-
-
-class ModelClash(TestBaseModel):
-    settings = ClashSettings1_2()
 
 module_clash2 = ClashSettings2(app_label='dbsettings')
 
 
-class NonRequiredSettings(dbsettings.Group):
-    integer = dbsettings.IntegerValue(required=False)
-    string = dbsettings.StringValue(required=False)
-    fl = dbsettings.FloatValue(required=False)
-    decimal = dbsettings.DecimalValue(required=False)
-    percent = dbsettings.PercentValue(required=False)
-
-
-class NonReq(TestBaseModel):
-    non_req = NonRequiredSettings()
-
-
-@test.override_settings(ROOT_URLCONF='dbsettings.tests.test_urls')
+@test.override_settings(ROOT_URLCONF='tests.test_urls')
 class SettingsTestCase(test.TestCase):
 
     @classmethod
@@ -126,6 +42,7 @@ class SettingsTestCase(test.TestCase):
         super(SettingsTestCase, self).setUp()
         # Standard test fixtures don't update the in-memory cache.
         # So we have to do it ourselves this time.
+
         loading.set_setting_value(MODULE_NAME, 'Populated', 'boolean', True)
         loading.set_setting_value(MODULE_NAME, 'Populated', 'integer', 42)
         loading.set_setting_value(MODULE_NAME, 'Populated', 'string', 'Ni!')
@@ -135,8 +52,7 @@ class SettingsTestCase(test.TestCase):
                                   'a@b.com,c@d.com,e@f.com')
         loading.set_setting_value(MODULE_NAME, 'Populated', 'date', '2012-06-28')
         loading.set_setting_value(MODULE_NAME, 'Populated', 'time', '16:19:17')
-        loading.set_setting_value(MODULE_NAME, 'Populated', 'datetime',
-                                  '2012-06-28 16:19:17')
+        loading.set_setting_value(MODULE_NAME, 'Populated', 'datetime', '2012-06-28 16:19:17')
         loading.set_setting_value(MODULE_NAME, '', 'boolean', False)
         loading.set_setting_value(MODULE_NAME, '', 'integer', 14)
         loading.set_setting_value(MODULE_NAME, '', 'string', 'Module')
@@ -333,9 +249,7 @@ class SettingsTestCase(test.TestCase):
     def test_forms(self):
         "Forms should display only the appropriate settings"
         from django.contrib.auth.models import User, Permission
-        from django.core.urlresolvers import reverse
-
-        site_form = reverse(views.site_settings)
+        from django.urls import reverse
 
         # Set up a users to test the editor forms
         user = User.objects.create_user('dbsettings', '', 'dbsettings')
