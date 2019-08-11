@@ -17,7 +17,8 @@ class Setting(models.Model):
     module_name = models.CharField(max_length=255)
     class_name = models.CharField(max_length=255, blank=True)
     attribute_name = models.CharField(max_length=255)
-    value = models.CharField(max_length=VALUE_LENGTH, blank=True)
+    # value = models.CharField(max_length=VALUE_LENGTH, blank=True)
+    value = models.TextField(blank=True)
 
     if USE_SITES:
         site = models.ForeignKey(Site, on_delete=models.CASCADE)
