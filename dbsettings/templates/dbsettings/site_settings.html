@@ -28,16 +28,18 @@
             <caption>{% filter capfirst %}{{ module.grouper }}{% endfilter %}</caption>
             {% regroup module.list by class_name as classes %}
             {% for class in classes %}
-                <tr class="alt">
-                    <th>{% filter capfirst %}{% if class.grouper %}{{ class.grouper }}{% else %}{% trans "Application settings" %}{% endif %}{% endfilter %}</th>
-                    <th>&nbsp;</th>
-                </tr>
+                {% if class.grouper %}
+                    <tr class="alt">
+                        <th>{% filter capfirst %}{% if class.grouper %}{{ class.grouper }}{% endif %}{% endfilter %}</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                {% endif %}
                 {% include "dbsettings/values.html" %}
             {% endfor %}
             </table>
         </div>
     {% endfor %}
-{% csrf_token %}<input type="submit" value="Save" class="default" />
+{% csrf_token %}<input type="submit" value="{% trans "Save" %}" class="default" />
 </form>
 {% else %}
     <p>{% trans "You don't have permission to edit values." %}</p>
