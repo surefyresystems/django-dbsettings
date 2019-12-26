@@ -78,7 +78,7 @@ def set_setting_value(module_name, class_name, attribute_name, value):
     storage = get_setting_storage(module_name, class_name, attribute_name)
     storage.value = setting.get_db_prep_save(value)
     storage.save()
-    setting_changed.send(sender=setting)
+    setting_changed.send(sender=setting, value=setting.to_python(value))
     if USE_CACHE:
         key = _get_cache_key(module_name, class_name, attribute_name)
         cache.delete(key)

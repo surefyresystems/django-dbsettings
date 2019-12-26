@@ -372,6 +372,9 @@ something like this in your appconfig's ``ready()`` method::
 
     setting_changed.connect(my_function, sender=get_setting('myapp', 'MyClass', 'myattr'))
 
+`my_function` will be called with a `sender` and `value` parameters, the latter containing a
+new value assigned to the setting.
+
 Value types
 ===========
 

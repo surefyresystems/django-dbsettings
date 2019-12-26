@@ -369,20 +369,34 @@ class SettingsTestCase(test.TestCase):
         self.assertEqual(len(response.context[0][variable_name].fields), fields_num)
 
     def test_signals(self):
+        value = 'signal fired'
+
         handler = MagicMock()
         setting = loading.get_setting(MODULE_NAME, 'Unpopulated', 'string')
         signals.setting_changed.connect(handler, sender=setting)
-        Unpopulated.settings.string = 'signal fired'
-        handler.assert_called_once_with(signal=signals.setting_changed, sender=setting)
+        Unpopulated.settings.string = value
+        handler.assert_called_once_with(signal=signals.setting_changed, sender=setting, value=value)
 
         handler = MagicMock()
         setting = loading.get_setting(MODULE_NAME, 'Populated', 'string')
         signals.setting_changed.connect(handler, sender=setting)
-        Populated.settings.string = 'signal fired'
-        handler.assert_called_once_with(signal=signals.setting_changed, sender=setting)
+        Populated.settings.string = value
+        handler.assert_called_once_with(signal=signals.setting_changed, sender=setting, value=value)
 
         handler = MagicMock()
         setting = loading.get_setting(MODULE_NAME, 'Combined', 'string')
         signals.setting_changed.connect(handler, sender=setting)
-        Combined.settings.string = 'signal fired'
-        handler.assert_called_once_with(signal=signals.setting_changed, sender=setting)
+        Combined.settings.string = value
+        handler.assert_called_once_with(signal=signals.setting_changed, sender=setting, value=value)
+
+        handler = MagicMock()
+        setting = loading.get_setting(MODULE_NAME, 'Unpopulated', 'integer')
+        signals.setting_changed.connect(handler, sender=setting)
+        Unpopulated.settings.integer = 43
+        handler.assert_called_once_with(signal=signals.setting_changed, sender=setting, value=43)
+
+        # If value has not changed, then the signal is not sent.
+        new_handler = MagicMock()
+        signals.setting_changed.connect(new_handler, sender=setting)
+        Unpopulated.settings.integer = 43
+        new_handler.assert_not_called()
