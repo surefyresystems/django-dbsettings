@@ -30,7 +30,7 @@ Requirements
 +------------------+------------+--------------+
 | Dbsettings       | Python     | Django       |
 +==================+============+==============+
-| ==1.0            | 3.5        | 2.0 - 2.2    |
+| ==1.0.1          | 3.5        | 2.0 - 2.2    |
 |                  +------------+--------------+
 |                  | 3.6 - 3.8  | 2.0 - 3.0    |
 +------------------+------------+--------------+
@@ -525,7 +525,7 @@ some of the settings provided earlier in this document::
 Changelog
 =========
 
-**1.0** (26/12/2019)
+**1.0.1** (26/12/2019)
     - Introduced a signal `setting_changed`
     - Added compatibility with Django 3.0
     - Dropped compatibility with Django 1.10, 1.11
