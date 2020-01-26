@@ -4,7 +4,6 @@ from unittest.mock import MagicMock
 import django
 from django.db import models
 from django import test
-from django.utils.functional import curry
 from django.utils.translation import activate, deactivate
 
 import dbsettings
@@ -223,7 +222,7 @@ class SettingsTestCase(test.TestCase):
         # By adding an invalid attribute
         attrs['problem'] = 'not a Value'
         # This should fail
-        self.assertRaises(TypeError, curry(type, 'BadGroup', (dbsettings.Group,), attrs))
+        self.assertRaises(TypeError, lambda: type('BadGroup', (dbsettings.Group,), attrs))
 
         # Make sure affect models get the new permissions
         self.assertTrue('can_edit_populated_settings' in dict(Populated._meta.permissions))
