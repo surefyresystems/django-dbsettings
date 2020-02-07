@@ -280,24 +280,20 @@ class ImageValue(Value):
     class field(forms.ImageField):
         class widget(forms.FileInput):
             "Widget with preview"
+            template_name = 'dbsettings/image_widget.html'
 
-            def render(self, name, value, attrs=None):
-                output = []
+            def render(self, name, value, attrs=None, renderer=None):
+                """Render the widget as an HTML string."""
+                context = self.get_context(name, value, attrs)
 
-                try:
-                    if not value:
-                        raise IOError('No value')
-
+                if value:
                     from PIL import Image
                     Image.open(value.file)
-                    file_name = pjoin(settings.MEDIA_URL, value.name).replace("\\", "/")
-                    params = {"file_name": file_name}
-                    output.append('<p><img src="%(file_name)s" width="100" /></p>' % params)
-                except IOError:
-                    pass
+                    context['image_url'] = pjoin(settings.MEDIA_URL, value.name).replace("\\", "/")
+                else:
+                    context['image_url'] = None
 
-                output.append(forms.FileInput.render(self, name, value, attrs))
-                return mark_safe(''.join(output))
+                return self._render(self.template_name, context, renderer)
 
     def to_python(self, value):
         "Returns a native Python object suitable for immediate use"
