@@ -76,7 +76,7 @@ def set_setting_value(module_name, class_name, attribute_name, value):
     from dbsettings.settings import USE_CACHE
     setting = get_setting(module_name, class_name, attribute_name)
     storage = get_setting_storage(module_name, class_name, attribute_name)
-    storage.value = setting.get_db_prep_save(value)
+    storage.value = setting.get_db_prep_save(value, oldvalue=storage.value)
     storage.save()
     setting_changed.send(sender=setting, value=setting.to_python(value))
     if USE_CACHE:

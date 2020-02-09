@@ -91,7 +91,7 @@ class Value(object):
         "Returns a native Python object suitable for immediate use"
         return value
 
-    def get_db_prep_save(self, value):
+    def get_db_prep_save(self, value, oldvalue=None):
         "Returns a value suitable for storage into a CharField"
         return str(value)
 
@@ -152,7 +152,7 @@ class DurationValue(Value):
         except OverflowError:
             raise forms.ValidationError('The maximum allowed value is %s' % datetime.timedelta.max)
 
-    def get_db_prep_save(self, value):
+    def get_db_prep_save(self, value, **kwargs):
         return str(value.days * 24 * 3600 + value.seconds
                              + float(value.microseconds) / 1000000)
 
@@ -271,8 +271,8 @@ class MultiSeparatorValue(TextValue):
 
 class ImageValue(Value):
     def __init__(self, *args, **kwargs):
-        if 'upload_to' in kwargs:
-            self._upload_to = kwargs.pop('upload_to', '')
+        self._upload_to = kwargs.pop('upload_to', '')
+        self._delete_old = kwargs.pop('delete_old', True)
         super(ImageValue, self).__init__(*args, **kwargs)
 
     class field(forms.ImageField):
@@ -301,7 +301,7 @@ class ImageValue(Value):
         "Returns a native Python object suitable for immediate use"
         return str(value)
 
-    def get_db_prep_save(self, value):
+    def get_db_prep_save(self, value, oldvalue=None):
         "Returns a value suitable for storage into a CharField"
         if not value:
             return None
@@ -316,6 +316,12 @@ class ImageValue(Value):
         with open(dest_name, 'wb+') as dest_file:
             for chunk in value.chunks():
                 dest_file.write(chunk)
+
+        # Delete old file
+        if oldvalue and self._delete_old:
+            old_dest_name = pjoin(settings.MEDIA_ROOT, oldvalue)
+            if os.path.exists(old_dest_name):
+                os.unlink(old_dest_name)
 
         return str(image_path)
 
@@ -352,7 +358,7 @@ class DateTimeValue(Value):
                 continue
         return None
 
-    def get_db_prep_save(self, value):
+    def get_db_prep_save(self, value, **kwargs):
         if isinstance(value, str):
             return value
         return value.strftime(self._formats[0])

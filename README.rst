@@ -473,10 +473,16 @@ ImageValue
 
 Allows to upload image and view its preview.
 
-ImageValue has optional ``upload_to`` keyword, which specify path
-(relative to ``MEDIA_ROOT``), where uploaded images will be stored.
-If keyword is not present, files will be saved directly under
-``MEDIA_ROOT``.
+ImageValue has optional keyword arguments:
+
+- ``upload_to`` specifies path (relative to ``MEDIA_ROOT``), where uploaded
+  images will be stored. If argument is not present, files will be saved
+  directly under ``MEDIA_ROOT``.
+- ``delete_old`` (default to True) controls whether to delete the old file when
+  the value has changed
+
+In Python, the value is accessed as a standard string (file name, relative to
+``MEDIA_ROOT``).
 
 PasswordValue
 -------------
@@ -525,6 +531,9 @@ some of the settings provided earlier in this document::
 Changelog
 =========
 
+**dev**
+    - Added ``delete_old`` parameter to ImageValue
+    - Make ``upload_to`` parameter to ImageValue no longer required.
 **1.0.1** (26/12/2019)
     - Introduced a signal `setting_changed`
     - Added compatibility with Django 3.0
