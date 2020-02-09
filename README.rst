@@ -534,6 +534,7 @@ Changelog
 **dev**
     - Added ``delete_old`` parameter to ImageValue
     - Make ``upload_to`` parameter to ImageValue no longer required.
+    - Fix PasswordValue to not render widget as required.
 **1.0.1** (26/12/2019)
     - Introduced a signal `setting_changed`
     - Added compatibility with Django 3.0

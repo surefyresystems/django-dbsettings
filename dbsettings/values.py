@@ -223,6 +223,8 @@ class PasswordValue(Value):
         widget = forms.PasswordInput
 
         def __init__(self, **kwargs):
+            if kwargs['initial']:
+                kwargs['required'] = False
             if not kwargs.get('help_text'):
                 kwargs['help_text'] = _(
                     'Leave empty in order to retain old password. Provide new value to change.')
