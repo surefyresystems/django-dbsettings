@@ -30,7 +30,7 @@ Requirements
 +------------------+------------+--------------+
 | Dbsettings       | Python     | Django       |
 +==================+============+==============+
-| ==1.0.1          | 3.5        | 2.0 - 2.2    |
+| >=1.0            | 3.5        | 2.0 - 2.2    |
 |                  +------------+--------------+
 |                  | 3.6 - 3.8  | 2.0 - 3.0    |
 +------------------+------------+--------------+
@@ -531,7 +531,8 @@ some of the settings provided earlier in this document::
 Changelog
 =========
 
-**dev**
+**1.1.0** (21/03/2020)
+    - Fixed image widget in Django 2.1
     - Added ``delete_old`` parameter to ImageValue
     - Make ``upload_to`` parameter to ImageValue no longer required.
     - Fix PasswordValue to not render widget as required.
