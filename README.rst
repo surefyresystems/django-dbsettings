@@ -30,6 +30,10 @@ Requirements
 +------------------+------------+--------------+
 | Dbsettings       | Python     | Django       |
 +==================+============+==============+
+| >=1.0            | 3.5        | 2.0 - 2.2    |
+|                  +------------+--------------+
+|                  | 3.6 - 3.8  | 2.0 - 3.0    |
++------------------+------------+--------------+
 | ==0.11           | 3.5 - 3.7  | 1.10 - 2.2   |
 |                  +------------+--------------+
 |                  | 2.7        | 1.10 - 1.11  |
@@ -361,6 +365,20 @@ Since settings aren't related to individual model instances, any settings that
 are set on models may only be accessed by the model class itself. Attempting to
 access settings on an instance will raise an ``AttributeError``.
 
+Triggering actions on settings changes
+--------------------------------------
+
+A signal is sent whenever a setting changes. You can receive it by doing
+something like this in your appconfig's ``ready()`` method::
+
+    from dbsetting.loading import get_setting
+    from dbsettings.signals import setting_changed
+
+    setting_changed.connect(my_function, sender=get_setting('myapp', 'MyClass', 'myattr'))
+
+`my_function` will be called with a `sender` and `value` parameters, the latter containing a
+new value assigned to the setting.
+
 Value types
 ===========
 
@@ -455,10 +473,16 @@ ImageValue
 
 Allows to upload image and view its preview.
 
-ImageValue has optional ``upload_to`` keyword, which specify path
-(relative to ``MEDIA_ROOT``), where uploaded images will be stored.
-If keyword is not present, files will be saved directly under
-``MEDIA_ROOT``.
+ImageValue has optional keyword arguments:
+
+- ``upload_to`` specifies path (relative to ``MEDIA_ROOT``), where uploaded
+  images will be stored. If argument is not present, files will be saved
+  directly under ``MEDIA_ROOT``.
+- ``delete_old`` (default to True) controls whether to delete the old file when
+  the value has changed
+
+In Python, the value is accessed as a standard string (file name, relative to
+``MEDIA_ROOT``).
 
 PasswordValue
 -------------
@@ -507,6 +531,16 @@ some of the settings provided earlier in this document::
 Changelog
 =========
 
+**1.1.0** (21/03/2020)
+    - Fixed image widget in Django 2.1
+    - Added ``delete_old`` parameter to ImageValue
+    - Make ``upload_to`` parameter to ImageValue no longer required.
+    - Fix PasswordValue to not render widget as required.
+**1.0.1** (26/12/2019)
+    - Introduced a signal `setting_changed`
+    - Added compatibility with Django 3.0
+    - Dropped compatibility with Django 1.10, 1.11
+    - Dropped compatibility with Python 2
 **0.11.0** (31/07/2019)
     - Added compatibility with Django 1.11, 2.0, 2.1, 2.2
     - Dropped compatibility with Django 1.7, 1.8, 1.9

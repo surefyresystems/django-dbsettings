@@ -1,14 +1,13 @@
 import datetime
+from unittest.mock import MagicMock
 
 import django
 from django.db import models
 from django import test
-from django.utils import six
-from django.utils.functional import curry
 from django.utils.translation import activate, deactivate
 
 import dbsettings
-from dbsettings import loading, views
+from dbsettings import loading, signals, views
 
 from .models import TestSettings, Defaults, TestBaseModel, Populated, Unpopulated, Blankable, \
     Editable, Combined, ClashSettings1, ClashSettings2, ClashSettings1_2, ModelClash, NonReq, \
@@ -137,7 +136,7 @@ class SettingsTestCase(test.TestCase):
         # Values should be coerced to the proper Python types
         self.assertTrue(isinstance(Populated.settings.boolean, bool))
         self.assertTrue(isinstance(Populated.settings.integer, int))
-        self.assertTrue(isinstance(Populated.settings.string, six.string_types))
+        self.assertTrue(isinstance(Populated.settings.string, str))
 
         # Settings can not be accessed directly from models, only instances
         self.assertRaises(AttributeError, lambda: Populated().settings)
@@ -223,7 +222,7 @@ class SettingsTestCase(test.TestCase):
         # By adding an invalid attribute
         attrs['problem'] = 'not a Value'
         # This should fail
-        self.assertRaises(TypeError, curry(type, 'BadGroup', (dbsettings.Group,), attrs))
+        self.assertRaises(TypeError, lambda: type('BadGroup', (dbsettings.Group,), attrs))
 
         # Make sure affect models get the new permissions
         self.assertTrue('can_edit_populated_settings' in dict(Populated._meta.permissions))
@@ -367,3 +366,36 @@ class SettingsTestCase(test.TestCase):
         response = self.client.get(url)
         self.assertEqual(present, global_setting in response.context[0][variable_name].fields)
         self.assertEqual(len(response.context[0][variable_name].fields), fields_num)
+
+    def test_signals(self):
+        value = 'signal fired'
+
+        handler = MagicMock()
+        setting = loading.get_setting(MODULE_NAME, 'Unpopulated', 'string')
+        signals.setting_changed.connect(handler, sender=setting)
+        Unpopulated.settings.string = value
+        handler.assert_called_once_with(signal=signals.setting_changed, sender=setting, value=value)
+
+        handler = MagicMock()
+        setting = loading.get_setting(MODULE_NAME, 'Populated', 'string')
+        signals.setting_changed.connect(handler, sender=setting)
+        Populated.settings.string = value
+        handler.assert_called_once_with(signal=signals.setting_changed, sender=setting, value=value)
+
+        handler = MagicMock()
+        setting = loading.get_setting(MODULE_NAME, 'Combined', 'string')
+        signals.setting_changed.connect(handler, sender=setting)
+        Combined.settings.string = value
+        handler.assert_called_once_with(signal=signals.setting_changed, sender=setting, value=value)
+
+        handler = MagicMock()
+        setting = loading.get_setting(MODULE_NAME, 'Unpopulated', 'integer')
+        signals.setting_changed.connect(handler, sender=setting)
+        Unpopulated.settings.integer = 43
+        handler.assert_called_once_with(signal=signals.setting_changed, sender=setting, value=43)
+
+        # If value has not changed, then the signal is not sent.
+        new_handler = MagicMock()
+        signals.setting_changed.connect(new_handler, sender=setting)
+        Unpopulated.settings.integer = 43
+        new_handler.assert_not_called()

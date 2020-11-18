@@ -1,5 +1,4 @@
 from __future__ import unicode_literals
-from django.utils import six
 
 import datetime
 from decimal import Decimal
@@ -92,13 +91,13 @@ class Value(object):
         "Returns a native Python object suitable for immediate use"
         return value
 
-    def get_db_prep_save(self, value):
+    def get_db_prep_save(self, value, oldvalue=None):
         "Returns a value suitable for storage into a CharField"
-        return six.text_type(value)
+        return str(value)
 
     def to_editor(self, value):
         "Returns a value suitable for display in a form widget"
-        return six.text_type(value)
+        return str(value)
 
 ###############
 # VALUE TYPES #
@@ -153,8 +152,8 @@ class DurationValue(Value):
         except OverflowError:
             raise forms.ValidationError('The maximum allowed value is %s' % datetime.timedelta.max)
 
-    def get_db_prep_save(self, value):
-        return six.text_type(value.days * 24 * 3600 + value.seconds
+    def get_db_prep_save(self, value, **kwargs):
+        return str(value.days * 24 * 3600 + value.seconds
                              + float(value.microseconds) / 1000000)
 
 
@@ -208,7 +207,7 @@ class TextValue(Value):
     field = forms.CharField
 
     def to_python(self, value):
-        return six.text_type(value)
+        return str(value)
 
 
 class EmailValue(Value):
@@ -216,7 +215,7 @@ class EmailValue(Value):
     field = forms.EmailField
 
     def to_python(self, value):
-        return six.text_type(value)
+        return str(value)
 
 
 class PasswordValue(Value):
@@ -224,6 +223,8 @@ class PasswordValue(Value):
         widget = forms.PasswordInput
 
         def __init__(self, **kwargs):
+            if kwargs['initial']:
+                kwargs['required'] = False
             if not kwargs.get('help_text'):
                 kwargs['help_text'] = _(
                     'Leave empty in order to retain old password. Provide new value to change.')
@@ -262,7 +263,7 @@ class MultiSeparatorValue(TextValue):
 
     def to_python(self, value):
         if value:
-            value = six.text_type(value)
+            value = str(value)
             value = value.split(self.separator)
             value = [x.strip() for x in value]
         else:
@@ -272,42 +273,38 @@ class MultiSeparatorValue(TextValue):
 
 class ImageValue(Value):
     def __init__(self, *args, **kwargs):
-        if 'upload_to' in kwargs:
-            self._upload_to = kwargs.pop('upload_to', '')
+        self._upload_to = kwargs.pop('upload_to', '')
+        self._delete_old = kwargs.pop('delete_old', True)
         super(ImageValue, self).__init__(*args, **kwargs)
 
     class field(forms.ImageField):
         class widget(forms.FileInput):
             "Widget with preview"
+            template_name = 'dbsettings/image_widget.html'
 
-            def render(self, name, value, attrs=None):
-                output = []
+            def render(self, name, value, attrs=None, renderer=None):
+                """Render the widget as an HTML string."""
+                context = self.get_context(name, value, attrs)
 
-                try:
-                    if not value:
-                        raise IOError('No value')
-
+                if value:
                     from PIL import Image
                     Image.open(value.file)
-                    file_name = pjoin(settings.MEDIA_URL, value.name).replace("\\", "/")
-                    params = {"file_name": file_name}
-                    output.append('<p><img src="%(file_name)s" width="100" /></p>' % params)
-                except IOError:
-                    pass
+                    context['image_url'] = pjoin(settings.MEDIA_URL, value.name).replace("\\", "/")
+                else:
+                    context['image_url'] = None
 
-                output.append(forms.FileInput.render(self, name, value, attrs))
-                return mark_safe(''.join(output))
+                return self._render(self.template_name, context, renderer)
 
     def to_python(self, value):
         "Returns a native Python object suitable for immediate use"
-        return six.text_type(value)
+        return str(value)
 
-    def get_db_prep_save(self, value):
+    def get_db_prep_save(self, value, oldvalue=None):
         "Returns a value suitable for storage into a CharField"
         if not value:
             return None
 
-        hashed_name = md5(six.text_type(time.time()).encode()).hexdigest() + value.name[-4:]
+        hashed_name = md5(str(time.time()).encode()).hexdigest() + value.name[-4:]
         image_path = pjoin(self._upload_to, hashed_name)
         dest_name = pjoin(settings.MEDIA_ROOT, image_path)
         directory = pjoin(settings.MEDIA_ROOT, self._upload_to)
@@ -318,7 +315,13 @@ class ImageValue(Value):
             for chunk in value.chunks():
                 dest_file.write(chunk)
 
-        return six.text_type(image_path)
+        # Delete old file
+        if oldvalue and self._delete_old:
+            old_dest_name = pjoin(settings.MEDIA_ROOT, oldvalue)
+            if os.path.exists(old_dest_name):
+                os.unlink(old_dest_name)
+
+        return str(image_path)
 
     def to_editor(self, value):
         "Returns a value suitable for display in a form widget"
@@ -353,8 +356,8 @@ class DateTimeValue(Value):
                 continue
         return None
 
-    def get_db_prep_save(self, value):
-        if isinstance(value, six.string_types):
+    def get_db_prep_save(self, value, **kwargs):
+        if isinstance(value, str):
             return value
         return value.strftime(self._formats[0])
 
