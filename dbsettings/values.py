@@ -8,7 +8,7 @@ import time
 import os
 
 from django import forms
-from django.conf import settings
+from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import formats
 from django.utils.safestring import mark_safe
@@ -287,9 +287,7 @@ class ImageValue(Value):
                 context = self.get_context(name, value, attrs)
 
                 if value:
-                    from PIL import Image
-                    Image.open(value.file)
-                    context['image_url'] = pjoin(settings.MEDIA_URL, value.name).replace("\\", "/")
+                    context['image_url'] = default_storage.url(value.name)
                 else:
                     context['image_url'] = None
 
@@ -306,20 +304,13 @@ class ImageValue(Value):
 
         hashed_name = md5(str(time.time()).encode()).hexdigest() + value.name[-4:]
         image_path = pjoin(self._upload_to, hashed_name)
-        dest_name = pjoin(settings.MEDIA_ROOT, image_path)
-        directory = pjoin(settings.MEDIA_ROOT, self._upload_to)
 
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        with open(dest_name, 'wb+') as dest_file:
-            for chunk in value.chunks():
-                dest_file.write(chunk)
+        image_path = default_storage.save(image_path, value.file)
 
         # Delete old file
         if oldvalue and self._delete_old:
-            old_dest_name = pjoin(settings.MEDIA_ROOT, oldvalue)
-            if os.path.exists(old_dest_name):
-                os.unlink(old_dest_name)
+            if default_storage.exists(oldvalue):
+                default_storage.delete(oldvalue)
 
         return str(image_path)
 
@@ -328,9 +319,8 @@ class ImageValue(Value):
         if not value:
             return None
 
-        file_name = pjoin(settings.MEDIA_ROOT, value)
         try:
-            with open(file_name, 'rb') as f:
+            with default_storage.open(value, 'rb') as f:
                 uploaded_file = SimpleUploadedFile(value, f.read(), 'image')
 
                 # hack to retrieve path from `name` attribute
