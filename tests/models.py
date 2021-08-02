@@ -13,6 +13,7 @@ class TestSettings(dbsettings.Group):
     date = dbsettings.DateValue()
     time = dbsettings.TimeValue()
     datetime = dbsettings.DateTimeValue()
+    string_choices = dbsettings.StringValue(choices=(("String1", "String 1"), ("String2", "String 2")))
 
 
 class Defaults(models.Model):

@@ -4,6 +4,7 @@ import datetime
 from decimal import Decimal
 from hashlib import md5
 from os.path import join as pjoin
+from functools import partialmethod
 import time
 import os
 
@@ -62,6 +63,18 @@ class Value(object):
         self.description = self.description or attribute_name.replace('_', ' ')
 
         setattr(cls, self.attribute_name, self)
+
+        if self.choices is not None:
+            # Don't override a get_FOO_display() method defined explicitly on
+            # this class, but don't check methods derived from inheritance, to
+            # allow overriding inherited choices. For more complex inheritance
+            # structures users should override contribute_to_class().
+            if 'get_%s_display' % attribute_name not in cls.__dict__:
+                setattr(
+                    cls,
+                    'get_%s_display' % attribute_name,
+                    partialmethod(cls._get_FIELD_display, field=self),
+                )
 
     @property
     def app(self):
