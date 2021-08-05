@@ -4,6 +4,9 @@ from dbsettings.values import Value
 from dbsettings.loading import register_setting, unregister_setting
 from dbsettings.management import mk_permissions
 
+from django.utils.encoding import force_str
+from django.utils.hashable import make_hashable
+
 __all__ = ['Group']
 
 
@@ -116,3 +119,9 @@ class Group(object, metaclass=GroupBase):
 
     def values(self):
         return [v for (_, v) in self]
+
+    def _get_FIELD_display(self, field):
+        value = getattr(self, field.attribute_name)
+        choices_dict = dict(make_hashable(field.choices))
+        # force_str() to coerce lazy strings.
+        return force_str(choices_dict.get(make_hashable(value), value), strings_only=True)
