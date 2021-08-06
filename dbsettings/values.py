@@ -66,10 +66,11 @@ class Value(object):
 
         if self.choices is not None:
             # Allows for adding get_FIELD_display() to fields with choices.
-            if 'get_%s_display' % attribute_name not in cls.__dict__:
+            display_attribute = 'get_%s_display' % attribute_name
+            if display_attribute not in cls.__dict__:
                 setattr(
                     cls,
-                    'get_%s_display' % attribute_name,
+                    display_attribute,
                     partialmethod(cls._get_FIELD_display, field=self),
                 )
 
