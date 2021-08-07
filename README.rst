@@ -203,6 +203,16 @@ setting.
 In addition, settings may be supplied with a list of available options, through
 the use of of the ``choices`` argument. This works exactly like the ``choices``
 argument for model fields, and that of the newforms ``ChoiceField``.
+When using ``choices``, a ``get_FOO_display`` method is added to settings, for example:
+
+::
+
+    country = dbsettings.StringValue(choices=(("USA", "United States"), ("BR", "Brazil")))
+    
+    >>> settings.country
+    "USA"
+    >>> settings.get_country_display()
+    "United States"
 
 The widget used for a value can be overriden using the ``widget`` keyword. For example:
 
@@ -531,6 +541,8 @@ some of the settings provided earlier in this document::
 Changelog
 =========
 
+**dev**
+    - Added ``get_FOO_display`` method for fields which have ``choices`` (thanks paulogiacomelli)
 **1.1.0** (21/03/2020)
     - Fixed image widget in Django 2.1
     - Added ``delete_old`` parameter to ImageValue
