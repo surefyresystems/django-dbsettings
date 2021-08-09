@@ -88,7 +88,7 @@ class SettingsTestCase(test.TestCase):
         self.assertEqual(Populated.settings.time, datetime.time(16, 19, 17))
         self.assertEqual(Populated.settings.datetime, datetime.datetime(2012, 6, 28, 16, 19, 17))
         self.assertEqual(Populated.settings.string_choices, "String1")
-        self.assertEqual(Populated.settings.get_string_choices_display(), "String 1")
+        self.assertEqual(Populated.settings.get_string_choices_display(), "First String Choice")
 
         # Module settings are kept separate from model settings
         self.assertEqual(module_settings.boolean, False)
@@ -111,7 +111,7 @@ class SettingsTestCase(test.TestCase):
         self.assertEqual(Combined.settings.time, datetime.time(14, 17, 15))
         self.assertEqual(Combined.settings.datetime, datetime.datetime(2010, 4, 26, 14, 17, 15))
         self.assertEqual(Combined.settings.string_choices, "String1")
-        self.assertEqual(Combined.settings.get_string_choices_display(), "String 1")
+        self.assertEqual(Combined.settings.get_string_choices_display(), "First String Choice")
 
 
         # Settings not in the database use empty defaults
@@ -132,7 +132,7 @@ class SettingsTestCase(test.TestCase):
         self.assertEqual(Defaults.settings.time, datetime.time(12, 3, 14))
         self.assertEqual(Defaults.settings.datetime, datetime.datetime(2012, 3, 14, 12, 3, 14))
         self.assertEqual(Defaults.settings.string_choices, "String2")
-        self.assertEqual(Defaults.settings.get_string_choices_display(), "String 2")
+        self.assertEqual(Defaults.settings.get_string_choices_display(), "Second String Choice")
 
         # Settings should be retrieved in the order of definition
         self.assertEqual(Populated.settings.keys(),
