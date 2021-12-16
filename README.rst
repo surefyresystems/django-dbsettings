@@ -30,6 +30,10 @@ Requirements
 +------------------+------------+--------------+
 | Dbsettings       | Python     | Django       |
 +==================+============+==============+
+| >=1.2            | 3.5        | 2.1 - 2.2    |
+|                  +------------+--------------+
+|                  | 3.6 - 3.8  | 2.1 - 3.2    |
++------------------+------------+--------------+
 | >=1.0            | 3.5        | 2.0 - 2.2    |
 |                  +------------+--------------+
 |                  | 3.6 - 3.8  | 2.0 - 3.0    |
@@ -547,8 +551,11 @@ some of the settings provided earlier in this document::
 Changelog
 =========
 
-**dev**
+**1.2.0** (16/12/2021)
+    - Fixed exception handling in cache operation and added `DBSETTINGS_CACHE_EXPIRATION` (thanks AminHP)
     - Added ``get_FOO_display`` method for fields which have ``choices`` (thanks paulogiacomelli)
+    - Use Django storage framework for ImageValue instead of manual filesystem handling (thanks j0nm1)
+    - Dropped compatibility with Django 2.0
 **1.1.0** (21/03/2020)
     - Fixed image widget in Django 2.1
     - Added ``delete_old`` parameter to ImageValue
