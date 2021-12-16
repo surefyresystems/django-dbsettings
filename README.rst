@@ -147,6 +147,12 @@ Alternatively you can disable caching of settings by setting
 ``DBSETTINGS_USE_CACHE = False`` in ``settings.py``. Beware though: every
 access of any setting will result in database hit.
 
+By default, entries are cached for a time that is default for the cache. You can
+override this by providing ``DBSETTINGS_CACHE_EXPIRATION``. Values interpreted
+as seconds, 0 means no caching and `None` means indefinite caching. See `more`_.
+
+.. _more: https://docs.djangoproject.com/en/2.2/ref/settings/#timeout
+
 Usage
 =====
 
