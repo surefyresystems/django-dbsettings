@@ -59,6 +59,7 @@ def app_settings(request, app_label, template='dbsettings/app_settings.html'):
 
     return render(request, template, {
         'title': title,
+        'no_settings': len(settings) == 0,
         'form': form,
     })
 
