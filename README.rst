@@ -30,11 +30,17 @@ Requirements
 +------------------+------------+--------------+
 | Dbsettings       | Python     | Django       |
 +==================+============+==============+
-| >=1.2            | 3.5        | 2.1 - 2.2    |
+| ==1.3            | 3.8 - 3.10 | 2.1 - 4.0    |
+|                  +------------+--------------+
+|                  | 3.6 - 3.7  | 2.1 - 3.2    |
+|                  +------------+--------------+
+|                  | 3.5        | 2.1 - 2.2    |
++------------------+------------+--------------+
+| ==1.2            | 3.5        | 2.1 - 2.2    |
 |                  +------------+--------------+
 |                  | 3.6 - 3.8  | 2.1 - 3.2    |
 +------------------+------------+--------------+
-| >=1.0            | 3.5        | 2.0 - 2.2    |
+| 1.0 - 1.1.0      | 3.5        | 2.0 - 2.2    |
 |                  +------------+--------------+
 |                  | 3.6 - 3.8  | 2.0 - 3.0    |
 +------------------+------------+--------------+
@@ -551,6 +557,10 @@ some of the settings provided earlier in this document::
 Changelog
 =========
 
+**1.3.0** (19/02/2022)
+    - Added compatibility with Django 4.0 (thanks nerdoc)
+    - Fixed misleading message (about permissions) in the editor if no settings were defined
+    - Fixed bug with app-level settings not present in the editor if ``verbose_name`` was not set
 **1.2.0** (16/12/2021)
     - Fixed exception handling in cache operation and added `DBSETTINGS_CACHE_EXPIRATION` (thanks AminHP)
     - Added ``get_FOO_display`` method for fields which have ``choices`` (thanks paulogiacomelli)
