@@ -26,6 +26,9 @@ SITE_ID= 1
 
 ROOT_URLCONF = 'tests.test_urls'
 
+# Required for Django 4.0
+STATIC_URL = '/static/'
+
 DATABASES =  {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
