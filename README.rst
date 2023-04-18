@@ -30,7 +30,17 @@ Requirements
 +------------------+------------+--------------+
 | Dbsettings       | Python     | Django       |
 +==================+============+==============+
-| >=1.0            | 3.5        | 2.0 - 2.2    |
+| ==1.3            | 3.8 - 3.10 | 2.1 - 4.0    |
+|                  +------------+--------------+
+|                  | 3.6 - 3.7  | 2.1 - 3.2    |
+|                  +------------+--------------+
+|                  | 3.5        | 2.1 - 2.2    |
++------------------+------------+--------------+
+| ==1.2            | 3.5        | 2.1 - 2.2    |
+|                  +------------+--------------+
+|                  | 3.6 - 3.8  | 2.1 - 3.2    |
++------------------+------------+--------------+
+| 1.0 - 1.1.0      | 3.5        | 2.0 - 2.2    |
 |                  +------------+--------------+
 |                  | 3.6 - 3.8  | 2.0 - 3.0    |
 +------------------+------------+--------------+
@@ -146,6 +156,12 @@ make sure to specify a proper backend when moving to a production environment.
 Alternatively you can disable caching of settings by setting
 ``DBSETTINGS_USE_CACHE = False`` in ``settings.py``. Beware though: every
 access of any setting will result in database hit.
+
+By default, entries are cached for a time that is default for the cache. You can
+override this by providing ``DBSETTINGS_CACHE_EXPIRATION``. Values interpreted
+as seconds, 0 means no caching and `None` means indefinite caching. See `more`_.
+
+.. _more: https://docs.djangoproject.com/en/2.2/ref/settings/#timeout
 
 Usage
 =====
@@ -541,8 +557,15 @@ some of the settings provided earlier in this document::
 Changelog
 =========
 
-**dev**
+**1.3.0** (19/02/2022)
+    - Added compatibility with Django 4.0 (thanks nerdoc)
+    - Fixed misleading message (about permissions) in the editor if no settings were defined
+    - Fixed bug with app-level settings not present in the editor if ``verbose_name`` was not set
+**1.2.0** (16/12/2021)
+    - Fixed exception handling in cache operation and added `DBSETTINGS_CACHE_EXPIRATION` (thanks AminHP)
     - Added ``get_FOO_display`` method for fields which have ``choices`` (thanks paulogiacomelli)
+    - Use Django storage framework for ImageValue instead of manual filesystem handling (thanks j0nm1)
+    - Dropped compatibility with Django 2.0
 **1.1.0** (21/03/2020)
     - Fixed image widget in Django 2.1
     - Added ``delete_old`` parameter to ImageValue
