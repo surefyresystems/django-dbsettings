@@ -397,7 +397,7 @@ Triggering actions on settings changes
 A signal is sent whenever a setting changes. You can receive it by doing
 something like this in your appconfig's ``ready()`` method::
 
-    from dbsetting.loading import get_setting
+    from dbsettings.loading import get_setting
     from dbsettings.signals import setting_changed
 
     setting_changed.connect(my_function, sender=get_setting('myapp', 'MyClass', 'myattr'))
