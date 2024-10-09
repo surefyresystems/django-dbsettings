@@ -91,6 +91,7 @@ class SettingsTestCase(test.TestCase):
         self.assertEqual(Populated.settings.datetime, datetime.datetime(2012, 6, 28, 16, 19, 17))
         self.assertEqual(Populated.settings.string_choices, "String1")
         self.assertEqual(Populated.settings.get_string_choices_display(), "First String Choice")
+        self.assertEqual(Populated.settings.no_caching_string, "Populated: Not Cached String")
 
         # Module settings are kept separate from model settings
         self.assertEqual(module_settings.boolean, False)
@@ -114,7 +115,7 @@ class SettingsTestCase(test.TestCase):
         self.assertEqual(Combined.settings.datetime, datetime.datetime(2010, 4, 26, 14, 17, 15))
         self.assertEqual(Combined.settings.string_choices, "String1")
         self.assertEqual(Combined.settings.get_string_choices_display(), "First String Choice")
-
+        self.assertEqual(Combined.settings.no_caching_string, "Combined: Not Cached String")
 
         # Settings not in the database use empty defaults
         self.assertEqual(Unpopulated.settings.boolean, False)
@@ -168,6 +169,7 @@ class SettingsTestCase(test.TestCase):
                                   datetime.time(1, 2, 3))
         loading.set_setting_value(MODULE_NAME, 'Unpopulated', 'datetime',
                                   datetime.datetime(1912, 6, 23, 1, 2, 3))
+        loading.set_setting_value(MODULE_NAME, "Unpopulated", "no_caching_string",  "Unpopulated: Not Cached String")
 
         self.assertEqual(Unpopulated.settings.boolean, True)
         self.assertEqual(Unpopulated.settings.integer, 13)
@@ -177,6 +179,7 @@ class SettingsTestCase(test.TestCase):
         self.assertEqual(Unpopulated.settings.date, datetime.date(1912, 6, 23))
         self.assertEqual(Unpopulated.settings.time, datetime.time(1, 2, 3))
         self.assertEqual(Unpopulated.settings.datetime, datetime.datetime(1912, 6, 23, 1, 2, 3))
+        self.assertEqual(Unpopulated.settings.no_caching_string, "Unpopulated: Not Cached String")
 
         # Updating settings with defaults
         loading.set_setting_value(MODULE_NAME, 'Defaults', 'boolean', False)
