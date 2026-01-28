@@ -304,19 +304,19 @@ class SettingsTestCase(test.TestCase):
             '%s__Editable__datetime' % MODULE_NAME: '',
         }
         response = self.client.post(site_form, data)
-        self.assertFormError(response, 'form', '%s__Editable__integer' % MODULE_NAME,
+        self.assertFormError(response.context['form'], '%s__Editable__integer' % MODULE_NAME,
                              'Enter a whole number.')
-        self.assertFormError(response, 'form', '%s__Editable__string' % MODULE_NAME,
+        self.assertFormError(response.context['form'], '%s__Editable__string' % MODULE_NAME,
                              'This field is required.')
-        self.assertFormError(response, 'form', '%s__Editable__list_semi_colon' % MODULE_NAME,
+        self.assertFormError(response.context['form'], '%s__Editable__list_semi_colon' % MODULE_NAME,
                              'This field is required.')
-        self.assertFormError(response, 'form', '%s__Editable__list_comma' % MODULE_NAME,
+        self.assertFormError(response.context['form'], '%s__Editable__list_comma' % MODULE_NAME,
                              'This field is required.')
-        self.assertFormError(response, 'form', '%s__Editable__date' % MODULE_NAME,
+        self.assertFormError(response.context['form'], '%s__Editable__date' % MODULE_NAME,
                              'Enter a valid date.')
-        self.assertFormError(response, 'form', '%s__Editable__time' % MODULE_NAME,
+        self.assertFormError(response.context['form'], '%s__Editable__time' % MODULE_NAME,
                              'Enter a valid time.')
-        self.assertFormError(response, 'form', '%s__Editable__datetime' % MODULE_NAME,
+        self.assertFormError(response.context['form'], '%s__Editable__datetime' % MODULE_NAME,
                              'This field is required.')
 
         # Successful submissions should redirect
