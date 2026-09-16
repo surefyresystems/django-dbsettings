@@ -30,6 +30,16 @@ Requirements
 +------------------+------------+--------------+
 | Dbsettings       | Python     | Django       |
 +==================+============+==============+
+| ==1.4            | 3.14       | 5.2          |
+|                  +------------+--------------+
+|                  | 3.13       | 5.1 - 5.2    |
+|                  +------------+--------------+
+|                  | 3.12       | 4.2 - 5.2    |
+|                  +------------+--------------+
+|                  | 3.10 - 3.11| 4.1 - 5.2    |
+|                  +------------+--------------+
+|                  | 3.8 - 3.9  | 4.1 - 4.2    |
++------------------+------------+--------------+
 | ==1.3            | 3.8 - 3.10 | 2.1 - 4.0    |
 |                  +------------+--------------+
 |                  | 3.6 - 3.7  | 2.1 - 3.2    |
@@ -224,7 +234,7 @@ When using ``choices``, a ``get_FOO_display`` method is added to settings, for e
 ::
 
     country = dbsettings.StringValue(choices=(("USA", "United States"), ("BR", "Brazil")))
-    
+
     >>> settings.country
     "USA"
     >>> settings.get_country_display()
@@ -397,7 +407,7 @@ Triggering actions on settings changes
 A signal is sent whenever a setting changes. You can receive it by doing
 something like this in your appconfig's ``ready()`` method::
 
-    from dbsetting.loading import get_setting
+    from dbsettings.loading import get_setting
     from dbsettings.signals import setting_changed
 
     setting_changed.connect(my_function, sender=get_setting('myapp', 'MyClass', 'myattr'))
